@@ -1,28 +1,10 @@
 set(HEADER_FILES
-        ${CMAKE_CURRENT_LIST_DIR}/include/chestnut/chestnut.hpp
-        )
-
-set(SOURCE_FILES
-        ${CMAKE_CURRENT_LIST_DIR}/source/chestnut.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/include/chestnut/kdtree.hpp
         )
 
 set(TARGET_NAME chestnut)
-add_library(${TARGET_NAME} ${SOURCE_FILES} ${HEADER_FILES})
-
-include(GenerateExportHeader)
-generate_export_header(${TARGET_NAME})
-string(TOLOWER "${TARGET_NAME}_export.h" GENERATED_TARGET_EXPORTS_FILE_NAME)
-file(COPY
-        ${CMAKE_CURRENT_BINARY_DIR}/${GENERATED_TARGET_EXPORTS_FILE_NAME}
-        DESTINATION
-        ${CMAKE_CURRENT_BINARY_DIR}/export_header_includes/chestnut)
-
-target_include_directories(${TARGET_NAME}
-        PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export_header_includes/>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
-        )
-
+add_library(${TARGET_NAME} INTERFACE)
+target_include_directories(${TARGET_NAME} INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
 add_library(${TARGET_NAME}::${TARGET_NAME} ALIAS ${TARGET_NAME})
 
 # "EXPORT_NAME: Exported name for target files.
@@ -37,11 +19,10 @@ message(STATUS "Configuring ${TARGET_NAME} ${${TARGET_NAME}_MAJOR}.${${TARGET_NA
 set_target_properties(${TARGET_NAME}
         PROPERTIES
         LANGUAGE CXX
-        LINKER_LANGUAGE CXX
         DEBUG_POSTFIX d
-        VERSION ${${TARGET_NAME}_MAJOR}.${${TARGET_NAME}_MINOR}.${${TARGET_NAME}_PATCH}
-        SOVERSION ${PROJECT_VERSION_MAJOR}
-        EXPORT_NAME ${TARGET_EXPORT_NAME})
+        VERSION 0.1.0
+        SOVERSION 0
+        )
 
 include(Warnings)
 add_warnings_and_compile_options(${TARGET_NAME} ${${PROJECT_NAME}_WARNINGS_AS_ERRORS})
@@ -52,9 +33,6 @@ if (${PROJECT_NAME}_STATIC_ANALYSIS)
 endif ()
 
 install(DIRECTORY "include/${TARGET_NAME}" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}")
-
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${GENERATED_TARGET_EXPORTS_FILE_NAME}"
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${TARGET_NAME}")
 
 install(TARGETS
         ${TARGET_NAME}

@@ -1,13 +1,13 @@
+#include "chestnut/kdtree.hpp"
 #include <benchmark/benchmark.h>
-#include <chestnut/chestnut.hpp>
 
-static void BM_chestnut(benchmark::State& state)
+static void BM_kdtree_default_constructor(benchmark::State& state)
 {
   for (auto _: state)
   {
-    chestnut::libraryFunction(42);
+    chestnut::KdTree<3> kdree;
   }
 }
-BENCHMARK(BM_chestnut);
+BENCHMARK(BM_kdtree_default_constructor);
 
 BENCHMARK_MAIN();
