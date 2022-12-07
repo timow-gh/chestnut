@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21) # CMakePresets are supported since version 3.21
 
-project(cpp_proj_template
+project(chestnut
         VERSION 0.1.0
         LANGUAGES CXX)
 
