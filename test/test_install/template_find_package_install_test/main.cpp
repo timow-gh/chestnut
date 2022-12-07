@@ -1,6 +1,7 @@
-#include <chestnut/chestnut.hpp>
+#include "chestnut/kdtree.hpp"
 
-int main() {
-    chestnut::libraryFunction(42);
-    return 0;
+int main()
+{
+  chestnut::KdTree<3> kdree;
+  return 0;
 }
