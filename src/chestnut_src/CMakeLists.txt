@@ -43,11 +43,9 @@ set_target_properties(${TARGET_NAME}
         SOVERSION ${PROJECT_VERSION_MAJOR}
         EXPORT_NAME ${TARGET_EXPORT_NAME})
 
-include(Warnings)
 add_warnings_and_compile_options(${TARGET_NAME} ${${PROJECT_NAME}_WARNINGS_AS_ERRORS})
 
 if (${PROJECT_NAME}_STATIC_ANALYSIS)
-    include(static_analysis)
     enable_static_analysis(${TARGET_NAME} ${${PROJECT_NAME}_WARNINGS_AS_ERRORS})
 endif ()
 

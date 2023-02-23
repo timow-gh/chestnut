@@ -13,5 +13,4 @@ list(APPEND CMAKE_MODULE_PATH "@PACKAGE_cmakeModulesDir@")
 include(CMakeFindDependencyMacro)
 #find_dependency(<lib-name> REQUIRED)
 
-
 include("@PACKAGE_cmakeProjTargetsFilePath@.cmake")
