@@ -1,9 +1,11 @@
 set(HEADER_FILES
-        ${CMAKE_CURRENT_LIST_DIR}/include/chestnut/kdtree.hpp
+        include/chestnut/kdtree.hpp
+        include/chestnut/traits.hpp
+        include/chestnut/point.hpp
         )
 
 set(TARGET_NAME chestnut)
-add_library(${TARGET_NAME} INTERFACE)
+add_library(${TARGET_NAME} INTERFACE ${HEADER_FILES})
 target_include_directories(${TARGET_NAME} INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>")
 add_library(${TARGET_NAME}::${TARGET_NAME} ALIAS ${TARGET_NAME})
 

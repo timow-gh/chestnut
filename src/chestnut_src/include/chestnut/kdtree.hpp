@@ -2,49 +2,13 @@
 #define CPP_LIB_TEMPLATE_LIBRARY_H
 
 #include <array>
+#include <chestnut/point.hpp>
 #include <cmath>
 #include <memory>
 #include <vector>
 
 namespace chestnut
 {
-
-template <std::size_t N>
-struct Point
-{
-  std::array<double, N> coordinates;
-  Point() = default;
-  Point(double x, double y, double z)
-      : coordinates(std::array<double, 3>{x, y, z})
-  {
-  }
-  explicit Point(std::array<double, N> coordinates)
-      : coordinates(coordinates)
-  {
-  }
-
-  double distance(const Point& other) const
-  {
-    double sum = 0;
-    for (std::size_t i = 0; i < N; ++i)
-      sum += (coordinates[i] - other.coordinates[i]) * (coordinates[i] - other.coordinates[i]);
-    return std::sqrt(sum);
-  }
-
-  double operator[](std::size_t index) const { return coordinates[index]; }
-
-  bool operator==(const Point& other) const { return coordinates == other.coordinates; }
-  bool operator!=(const Point& other) const { return coordinates != other.coordinates; }
-
-  friend std::ostream& operator<<(std::ostream& os, const Point& p)
-  {
-    for (std::size_t i = 0; i < N; ++i)
-    {
-      os << p.coordinates[i] << " ";
-    }
-    return os;
-  }
-};
 
 // See https://rosettacode.org/wiki/K-d_tree#C++
 // - kdtree move only
@@ -54,6 +18,7 @@ struct Point
 
 namespace details
 {
+
 template <typename TPoint>
 struct Node
 {
@@ -76,7 +41,7 @@ struct Node
 };
 } // namespace details
 
-template <std::size_t N, typename TPoint = Point<N>>
+template <std::size_t N, typename TPoint>
 class KdTree {
 public:
   using size_type = std::size_t;

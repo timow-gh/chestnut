@@ -10,5 +10,6 @@ function(create_test testName)
     add_test(NAME chestnut.${testName} COMMAND ${testName})
 endfunction()
 
-create_test(kdtree)
-create_test(point)
+create_test(test_kdtree)
+create_test(test_point)
+create_test(test_traits)
