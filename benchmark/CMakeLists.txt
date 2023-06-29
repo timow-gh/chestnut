@@ -51,7 +51,7 @@ set_target_properties(benchmark_main
         PROPERTIES
         DEBUG_POSTFIX d)
 
-set(LIBS chestnut::chestnut benchmark::benchmark_main)
+set(LIBS chestnut::chestnut chestnut_test_input::chestnut_test_input benchmark::benchmark_main)
 
 function(create_benchmark benchMarkName)
     add_executable(${benchMarkName} ${benchMarkName}.cpp)

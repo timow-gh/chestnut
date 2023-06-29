@@ -1,1 +1,2 @@
 add_subdirectory(chestnut_src)
+add_subdirectory(test_input)

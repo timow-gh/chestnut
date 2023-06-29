@@ -2,7 +2,7 @@ add_library(test_input INTERFACE)
 target_include_directories(test_input INTERFACE
         "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/example_input.hpp"
         )
-target_link_libraries(test_input INTERFACE chestnut::chestnut)
+target_link_libraries(test_input INTERFACE chestnut::chestnut chestnut_test_input::chestnut_test_input)
 
 function(create_test testName)
     add_executable(${testName} ${testName}.cpp)

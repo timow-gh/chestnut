@@ -4,34 +4,36 @@
 #include <array>
 #include <cmath>
 #include <memory>
+#include <type_traits>
 #include <vector>
 
 namespace chestnut
 {
 
-template <std::size_t N>
-struct Point
-{
-  std::array<double, N> coordinates;
-  Point() = default;
-  Point(double x, double y, double z)
-      : coordinates(std::array<double, 3>{x, y, z})
-  {
-  }
-  explicit Point(std::array<double, N> coordinates)
-      : coordinates(coordinates)
-  {
-  }
+template <std::size_t N, typename TFloat>
+struct Point {
+  using value_type = TFloat;
 
-  double distance(const Point& other) const
+  std::array<value_type, N> coordinates;
+  Point() = default;
+  Point(value_type x, value_type y, value_type z)
+      : coordinates(std::array<value_type, 3>{x, y, z})
+  {}
+  explicit Point(std::array<value_type, N> coordinates)
+      : coordinates(coordinates)
+  {}
+
+  value_type distance(const Point& other) const
   {
-    double sum = 0;
+    value_type sum{};
     for (std::size_t i = 0; i < N; ++i)
+    {
       sum += (coordinates[i] - other.coordinates[i]) * (coordinates[i] - other.coordinates[i]);
+    }
     return std::sqrt(sum);
   }
 
-  double operator[](std::size_t index) const { return coordinates[index]; }
+  value_type operator[](std::size_t index) const { return coordinates[index]; }
 
   bool operator==(const Point& other) const { return coordinates == other.coordinates; }
   bool operator!=(const Point& other) const { return coordinates != other.coordinates; }
@@ -46,6 +48,15 @@ struct Point
   }
 };
 
+using Point2d = Point<2, double>;
+using Point3d = Point<3, double>;
+using Point2f = Point<2, float>;
+using Point3f = Point<3, float>;
+using Point2i = Point<2, int>;
+using Point3i = Point<3, int>;
+
+} // namespace chestnut
+
 // See https://rosettacode.org/wiki/K-d_tree#C++
 // - kdtree move only
 // - nodes in a vector
@@ -55,16 +66,14 @@ struct Point
 namespace details
 {
 template <typename TPoint>
-struct Node
-{
+struct Node {
   TPoint point{};
   Node* left{nullptr};
   Node* right{nullptr};
 
   explicit Node(TPoint point)
       : point(point)
-  {
-  }
+  {}
 
   ~Node()
   {
@@ -74,29 +83,64 @@ struct Node
       delete right;
   }
 };
+
+// Traits that imitate type_traits features of older c++ standards than cxx11
+template <typename T, typename... Args>
+constexpr bool is_any_of_v = std::disjunction_v<std::is_same<T, Args>...>;
+
+template <typename T>
+constexpr bool is_floating_point_v = is_any_of_v<std::remove_cv_t<T>, float, double, long double>;
+
 } // namespace details
 
-template <std::size_t N, typename TPoint = Point<N>>
+namespace chestnut
+{
+
+template <std::size_t N, typename T = double, typename TPoint = chestnut::Point<N, T>>
 class KdTree {
 public:
   using size_type = std::size_t;
-  using value_type = typename TPoint;
+  using value_type = std::decay_t<typename TPoint>;
+  static_assert(details::is_floating_point_v<typename TPoint::value_type>, "Only floating point types are supported.");
   using node_type = details::Node<value_type>;
 
 private:
-  node_type* root{nullptr};
+  node_type* m_root{nullptr};
 
 public:
+  KdTree() = default;
+  KdTree(const KdTree&) = delete;
+  KdTree& operator=(const KdTree&) = delete;
+  KdTree(KdTree&& kdtree) noexcept
+  {
+    this->m_root = kdtree.m_root;
+    kdtree.m_root = nullptr;
+  }
+
+  KdTree& operator=(KdTree&& kdtree) noexcept
+  {
+    this->m_root = kdtree.m_root;
+    kdtree.m_root = nullptr;
+  }
+
+  ~KdTree()
+  {
+    if (m_root)
+    {
+      delete m_root;
+    }
+  }
+
   // Allows for duplicate points in the tree
   void insert(value_type point)
   {
-    if (root == nullptr)
+    if (m_root == nullptr)
     {
-      root = new node_type(point);
+      m_root = new node_type(point);
       return;
     }
 
-    node_type* current = root;
+    node_type* current = m_root;
     std::size_t depth = 0;
     while (true)
     {
@@ -123,16 +167,16 @@ public:
     }
   }
 
-  [[nodiscard]] bool is_empty() const { return root == nullptr; }
+  [[nodiscard]] bool is_empty() const noexcept { return m_root == nullptr; }
 
   [[nodiscard]] size_type size() const
   {
-    if (root == nullptr)
+    if (m_root == nullptr)
       return 0;
 
     std::size_t size{0};
     std::vector<node_type*> nodes;
-    nodes.push_back(root);
+    nodes.push_back(m_root);
     while (!nodes.empty())
     {
       node_type* node = nodes.back();
@@ -146,13 +190,13 @@ public:
     return size;
   }
 
-  [[nodiscard]] bool contains(const value_type& point) const
+  [[nodiscard]] bool contains(const value_type& point) const noexcept
   {
-    if (root == nullptr)
+    if (m_root == nullptr)
       return false;
 
     std::size_t depth{0};
-    node_type* node = root;
+    node_type* node = m_root;
     while (node)
     {
       if (node->point == point)
@@ -176,6 +220,8 @@ public:
     }
     return false;
   }
+
+  std::vector<value_type> nearestNeighbour() const { std::vector<value_type> result; }
 };
 
 } // namespace chestnut
